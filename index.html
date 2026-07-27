@@ -85,7 +85,7 @@
             
             <div id="authContainer" class="flex items-center space-x-3 pl-4 border-l border-slate-200">
                 <div id="authLoggedOut" class="flex items-center space-x-2">
-                    <button onclick="signInWithGoogle()" class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-semibold px-3.5 py-2 rounded-lg shadow-sm transition flex items-center space-x-2">
+                    <button onclick="signInWithGoogle()" title="Cần host HTTPS hoặc localhost" class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-semibold px-3.5 py-2 rounded-lg shadow-sm transition flex items-center space-x-2">
                         <i class="fa-brands fa-google text-red-500"></i>
                         <span>Đăng nhập Google</span>
                     </button>
@@ -186,12 +186,20 @@
                 <div class="w-14 h-14 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center mx-auto mb-4 text-xl font-bold">
                     <i class="fa-solid fa-shield-halved"></i>
                 </div>
-                <h3 class="text-base font-bold text-amber-900 mb-2">Đăng nhập Google + Master Password để mở Vault</h3>
-                <p class="text-xs text-amber-700 mb-6 leading-relaxed">Hệ thống lưu trữ 100%  Server an toàn tuyệt đối, gắn liền với tài khoản Google của bạn và đồng bộ thời gian thực trên mọi thiết bị.</p>
-                <button onclick="signInWithGoogle()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-5 py-3 rounded-xl shadow transition inline-flex items-center space-x-2">
-                    <i class="fa-brands fa-google text-sm"></i>
-                    <span>Đăng nhập Google</span>
-                </button>
+                <h3 class="text-base font-bold text-amber-900 mb-2">Đăng nhập để mở Vault</h3>
+                <p class="text-xs text-amber-700 mb-4 leading-relaxed">Email hoặc Google + Master Password. Dữ liệu mã hóa E2E trên Supabase.</p>
+                <div class="space-y-2.5 max-w-xs mx-auto text-left">
+                    <input id="emailAuthEmail" type="email" placeholder="Email" class="w-full border border-amber-200 rounded-lg px-3 py-2 text-xs bg-white focus:outline-none focus:border-blue-500">
+                    <input id="emailAuthPass" type="password" placeholder="Password (min 6)" class="w-full border border-amber-200 rounded-lg px-3 py-2 text-xs bg-white focus:outline-none focus:border-blue-500">
+                    <div class="flex gap-2">
+                        <button type="button" onclick="signInWithEmail()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-2.5 rounded-lg shadow">Đăng nhập</button>
+                        <button type="button" onclick="signUpWithEmail()" class="flex-1 bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-bold px-3 py-2.5 rounded-lg">Đăng ký</button>
+                    </div>
+                    <button type="button" onclick="signInWithGoogle()" class="w-full bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-bold px-3 py-2.5 rounded-lg inline-flex items-center justify-center gap-2">
+                        <i class="fa-brands fa-google text-red-500"></i><span>Google</span>
+                    </button>
+                    <p class="text-[10px] text-amber-800/80 leading-relaxed">Google không chạy với file:// — dùng Email hoặc host HTTPS (Netlify).</p>
+                </div>
             </div>
 
             <!-- DASHBOARD CONTAINER -->
@@ -1379,14 +1387,42 @@
         // ========== SUPABASE AUTH ==========
         async function signInWithGoogle() {
             if (!supabaseClient) {
-                alert('Chưa cấu hình Supabase.\\nMở file HTML, tìm SUPABASE_URL và SUPABASE_ANON_KEY rồi điền Project URL + anon key.');
+                alert('Chưa cấu hình Supabase.');
+                return;
+            }
+            if (location.protocol === 'file:') {
+                alert('Google login không chạy khi mở file HTML trực tiếp (file://).\n\nDùng Đăng nhập Email, hoặc host lên Netlify / localhost.');
                 return;
             }
             const { error } = await supabaseClient.auth.signInWithOAuth({
                 provider: 'google',
                 options: { redirectTo: window.location.href.split('#')[0] }
             });
-            if (error) alert('Lỗi đăng nhập: ' + error.message);
+            if (error) alert('Lỗi Google: ' + error.message);
+        }
+
+        async function signInWithEmail() {
+            if (!supabaseClient) { alert('Chưa cấu hình Supabase'); return; }
+            const email = (document.getElementById('emailAuthEmail') && document.getElementById('emailAuthEmail').value || '').trim();
+            const password = (document.getElementById('emailAuthPass') && document.getElementById('emailAuthPass').value) || '';
+            if (!email || !password) { alert('Nhập email và password'); return; }
+            const { error } = await supabaseClient.auth.signInWithPassword({ email: email, password: password });
+            if (error) alert('Đăng nhập thất bại: ' + error.message);
+        }
+
+        async function signUpWithEmail() {
+            if (!supabaseClient) { alert('Chưa cấu hình Supabase'); return; }
+            const email = (document.getElementById('emailAuthEmail') && document.getElementById('emailAuthEmail').value || '').trim();
+            const password = (document.getElementById('emailAuthPass') && document.getElementById('emailAuthPass').value) || '';
+            if (!email || !password) { alert('Nhập email và password'); return; }
+            if (password.length < 6) { alert('Password tối thiểu 6 ký tự'); return; }
+            const { data, error } = await supabaseClient.auth.signUp({ email: email, password: password });
+            if (error) { alert('Đăng ký thất bại: ' + error.message); return; }
+            if (data && data.user && !data.session) {
+                alert('Đăng ký OK. Tắt Confirm email trong Supabase (Auth → Providers → Email) rồi đăng nhập, hoặc xác nhận email.');
+            } else {
+                alert('Đăng ký thành công! Tiếp theo tạo Master Password.');
+            }
         }
 
         async function handleLogout() {
