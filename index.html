@@ -212,8 +212,8 @@
                             <span class="text-xs text-slate-500 font-medium">Setup:</span>
                             <select id="filterSetup" onchange="applyFiltersLive()" class="text-xs bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-blue-500 font-medium text-slate-700">
                                 <option value="all">All Setup</option>
-                                <option value="bb">Continuation</option>
-                                <option value="bb">Reversal</option>
+                                <option value="Continuation">Continuation</option>
+                                <option value="Reversal">Reversal</option>
                                 <option value="bb">Breaker Block</option>
                                 <option value="ob">Order Block</option>
                                 <option value="fvg">Fair Value Gap</option>
@@ -925,12 +925,13 @@
                     <div>
                         <label class="font-bold text-slate-700 block mb-1">Setup</label>
                         <select id="modalSetup" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 font-medium text-slate-700 focus:outline-none focus:border-blue-500">
-                                <option value="bb">Continuation</option>
-                                <option value="bb">Reversal</option>
-                                <option value="bb">Breaker Block</option>
-                                <option value="ob">Order Block</option>
-                                <option value="fvg">Fair Value Gap</option>
-                                <option value="liqui_sweep">Liquidity Sweep</option>
+                            <option value="">-- Select Setup --</option>
+                            <option value="Continuation">Continuation</option>
+                            <option value="Reversal">Reversal</option>
+                            <option value="bb">Breaker Block</option>
+                            <option value="ob">Order Block</option>
+                            <option value="fvg">Fair Value Gap</option>
+                            <option value="liqui_sweep">Liquidity Sweep</option>
                         </select>
                     </div>
                 </div>
@@ -941,6 +942,7 @@
                         <label class="font-bold text-slate-700 block mb-1">Loss Reason</label>
                         <select id="modalLossReason" class="w-full bg-white border border-slate-300 rounded-lg p-2 font-medium text-slate-700 focus:outline-none focus:border-blue-500">
                             <option value="">-- None / Win --</option>
+                            <option value="wrong_bias">Wrong bias</option>
                             <option value="no_confirmation">No confirmation</option>
                             <option value="early_entry">Early entry</option>
                             <option value="late_entry">Late entry</option>
@@ -958,6 +960,7 @@
                         <label class="font-bold text-slate-700 block mb-1">Win Reason</label>
                         <select id="modalWinReason" class="w-full bg-white border border-slate-300 rounded-lg p-2 font-medium text-slate-700 focus:outline-none focus:border-blue-500">
                             <option value="">-- None / Loss --</option>
+                            <option value="correct_bias">Correct bias</option>
                             <option value="htf_alignment">HTF alignment</option>
                             <option value="clean_setup">Clean setup</option>
                             <option value="good_entry">Good entry</option>
@@ -1308,15 +1311,31 @@
 
         // ========== LOCAL CACHE (encrypted-friendly plain cache only while unlocked) ==========
         function saveLocalData() {
-            if (!vaultUnlocked) return;
+            if (!vaultUnlocked) return false;
+            const payload = getFullStatePayload();
             try {
-                const payload = getFullStatePayload();
                 localStorage.setItem('jacooodevn_secure_cache_v1', JSON.stringify(payload));
             } catch (e) {
-                console.error('local cache save error', e);
+                console.warn('cache full, strip images', e);
+                try {
+                    const slim = JSON.parse(JSON.stringify(payload));
+                    if (Array.isArray(slim.trades)) {
+                        slim.trades.forEach(t => {
+                            if (t.chartImgs && t.chartImgs.length) t.chartImgs = [];
+                            if (t.chartImg) t.chartImg = '';
+                        });
+                    }
+                    localStorage.setItem('jacooodevn_secure_cache_v1', JSON.stringify(slim));
+                    appState.trades = slim.trades;
+                    alert('Storage almost full: images cleared so data could be cached.');
+                } catch (e2) {
+                    console.error(e2);
+                    alert('Browser storage full. Export Backup and reduce images.');
+                    return false;
+                }
             }
-            // Fire-and-forget cloud sync
             syncEncryptedToCloud();
+            return true;
         }
 
         function loadLocalCache() {
@@ -1681,19 +1700,36 @@
             reader.onload = function(e) {
                 try {
                     const data = JSON.parse(e.target.result);
-                    if (!data || typeof data !== 'object') throw new Error('File không hợp lệ');
-                    appState.trades = Array.isArray(data.trades) ? data.trades : [];
+                    if (!data || typeof data !== 'object') throw new Error('Invalid backup file');
+                    let trades = Array.isArray(data.trades) ? data.trades : [];
+                    // Prevent storage overflow: strip embedded base64 images if payload is huge
+                    const rawSize = (e.target.result || '').length;
+                    if (rawSize > 2_500_000) {
+                        const strip = confirm('Backup is very large (' + Math.round(rawSize/1024/1024*10)/10 + ' MB).
+
+OK = import WITHOUT chart images (recommended)
+Cancel = try full import (may fail if storage full)');
+                        if (strip) {
+                            trades = trades.map(t => {
+                                const x = Object.assign({}, t);
+                                x.chartImgs = [];
+                                x.chartImg = '';
+                                return x;
+                            });
+                        }
+                    }
+                    appState.trades = trades;
                     appState.planners = data.planners || {};
                     appState.accounts = data.accounts || { 'Live': { name: 'Live Account', balance: 100000 } };
                     appState.activeAccount = data.activeAccount || Object.keys(appState.accounts)[0] || 'Live';
                     if (data.currentYear != null) appState.currentYear = Number(data.currentYear);
                     if (data.currentMonth != null && data.currentMonth !== undefined) appState.currentMonth = Number(data.currentMonth);
                     if (data.plannerDate) appState.plannerDate = data.plannerDate;
-                    if (data.currentTab) appState.currentTab = data.currentTab;
                     saveLocalData();
                     updateAccountSelectors();
                     switchTab('overview', true);
-                    alert('Đã khôi phục thành công từ file backup!\nSố lệnh: ' + appState.trades.length);
+                    alert('Backup restored.
+Trades: ' + appState.trades.length);
                 } catch (err) {
                     console.error(err);
                     alert('Không đọc được file backup: ' + err.message);
@@ -2519,7 +2555,7 @@
                             const ctx = canvas.getContext('2d');
                             let width = img.width;
                             let height = img.height;
-                            const maxDim = 800;
+                            const maxDim = 600;
                             if (width > height && width > maxDim) {
                                 height *= maxDim / width;
                                 width = maxDim;
@@ -2530,7 +2566,7 @@
                             canvas.width = width;
                             canvas.height = height;
                             ctx.drawImage(img, 0, 0, width, height);
-                            const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.6);
+                            const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.45);
                             currentModalImages.push(compressedDataUrl);
                             renderImagePreviews();
                         };
@@ -2801,7 +2837,7 @@
                 const volume = Number(document.getElementById('modalVolume').value) || 1;
                 const fees = document.getElementById('modalFees').value || '1m';
                 const returnPct = Number(document.getElementById('modalReturnPct').value) || 0;
-                const setup = document.getElementById('modalSetup').value || 'ob';
+                const setup = document.getElementById('modalSetup').value || '';
                 const lossReason = document.getElementById('modalLossReason').value || '';
                 const winReason = document.getElementById('modalWinReason').value || '';
                 const holdMgmt = document.getElementById('modalHoldMgmt').value || '';
@@ -2898,7 +2934,7 @@
                         fees: '1m',
                         pnl: Number(pnl) || 0,
                         returnPct: ((Number(pnl) || 0) / 100000) * 100,
-                        setup: setup || 'ob',
+                        setup: setup || '',
                         lossReason,
                         winReason,
                         holdMgmt,
