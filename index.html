@@ -212,6 +212,8 @@
                             <span class="text-xs text-slate-500 font-medium">Setup:</span>
                             <select id="filterSetup" onchange="applyFiltersLive()" class="text-xs bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-blue-500 font-medium text-slate-700">
                                 <option value="all">All Setup</option>
+                                <option value="bb">Continuation</option>
+                                <option value="bb">Reversal</option>
                                 <option value="bb">Breaker Block</option>
                                 <option value="ob">Order Block</option>
                                 <option value="fvg">Fair Value Gap</option>
@@ -923,10 +925,12 @@
                     <div>
                         <label class="font-bold text-slate-700 block mb-1">Setup</label>
                         <select id="modalSetup" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 font-medium text-slate-700 focus:outline-none focus:border-blue-500">
-                            <option value="bb">Breaker Block</option>
-                            <option value="ob">Order Block</option>
-                            <option value="fvg">Fair Value Gap</option>
-                            <option value="liqui_sweep">Liquidity Sweep</option>
+                                <option value="bb">Continuation</option>
+                                <option value="bb">Reversal</option>
+                                <option value="bb">Breaker Block</option>
+                                <option value="ob">Order Block</option>
+                                <option value="fvg">Fair Value Gap</option>
+                                <option value="liqui_sweep">Liquidity Sweep</option>
                         </select>
                     </div>
                 </div>
