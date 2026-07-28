@@ -10,8 +10,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Supabase JS -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- Google Fonts Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script>
@@ -32,6 +30,7 @@
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="min-h-screen flex flex-col bg-slate-50 text-slate-800 antialiased overflow-x-hidden">
 
@@ -85,27 +84,24 @@
             
             <div id="authContainer" class="flex items-center space-x-3 pl-4 border-l border-slate-200">
                 <div id="authLoggedOut" class="flex items-center space-x-2">
-                    <button onclick="signInWithGoogle()" title="Cần host HTTPS hoặc localhost" class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-semibold px-3.5 py-2 rounded-lg shadow-sm transition flex items-center space-x-2">
-                        <i class="fa-brands fa-google text-red-500"></i>
-                        <span>Đăng nhập Google</span>
-                    </button>
+                    <span class="text-[10px] text-slate-500 hidden sm:inline">Online Secure</span>
                 </div>
                 <div id="authLoggedIn" class="hidden flex items-center space-x-3">
                     <div class="flex items-center space-x-2 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-full">
                         <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                        <span class="text-xs font-semibold text-emerald-700" id="vaultStatusBadge">Vault khóa</span>
+                        <span class="text-xs font-semibold text-emerald-700" id="vaultStatusBadge">Vault</span>
                     </div>
                     <div class="text-right hidden sm:block">
                         <div class="text-xs font-bold text-slate-900" id="userName">User</div>
-                        <div class="text-[10px] text-slate-500" id="userEmail">user@gmail.com</div>
+                        <div class="text-[10px] text-slate-500" id="userEmail"></div>
                     </div>
-                    <div id="userAvatarContainer" class="w-9 h-9 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-sm shadow">U</div>
-                    <button onclick="handleLogout()" title="Đăng xuất" class="text-slate-400 hover:text-rose-600 p-1.5 transition">
+                    <button type="button" onclick="handleLogout()" title="Logout" class="text-slate-400 hover:text-rose-600 p-1.5">
                         <i class="fa-solid fa-right-from-bracket text-sm"></i>
                     </button>
                 </div>
             </div>
         </div>
+    </div>
     </header>
 
     <!-- BODY LAYOUT -->
@@ -175,30 +171,28 @@
                 </div>
             </div>
             <div class="p-3 border-t border-slate-200 text-center bg-white flex-shrink-0 overflow-hidden">
-                <span class="sidebar-label text-[10px] text-slate-400 font-medium whitespace-nowrap">jacooodevn v3.8</span>
+                <span class="sidebar-label text-[10px] text-slate-400 font-medium whitespace-nowrap">jacooodevn v3.8 Secure</span>
             </div>
         </aside>
 
         <!-- MAIN CONTENT AREA -->
         <main class="flex-1 flex flex-col overflow-y-auto bg-slate-50 p-6 h-[calc(100vh-4rem)]">
             <!-- LOGIN REQUIRED BANNER -->
-            <div id="loginRequiredBanner" class="bg-amber-50 border border-amber-200 rounded-xl p-8 text-center my-auto max-w-lg mx-auto shadow-sm">
-                <div class="w-14 h-14 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center mx-auto mb-4 text-xl font-bold">
+            <div id="loginRequiredBanner" class="bg-amber-50 border border-amber-200 rounded-xl p-8 text-center my-12 max-w-md mx-auto shadow-sm">
+                <div class="w-14 h-14 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center mx-auto mb-4 text-xl">
                     <i class="fa-solid fa-shield-halved"></i>
                 </div>
-                <h3 class="text-base font-bold text-amber-900 mb-2">Đăng nhập để mở Vault</h3>
-                <p class="text-xs text-amber-700 mb-4 leading-relaxed">Email hoặc Google + Master Password. Dữ liệu mã hóa E2E trên Supabase.</p>
-                <div class="space-y-2.5 max-w-xs mx-auto text-left">
+                <h3 class="text-base font-bold text-amber-900 mb-2">Sign in to open Vault</h3>
+                <p class="text-xs text-amber-700 mb-4">Data is encrypted and stored online (Supabase).</p>
+                <div class="space-y-2.5 text-left">
                     <input id="emailAuthEmail" type="email" placeholder="Email" class="w-full border border-amber-200 rounded-lg px-3 py-2 text-xs bg-white focus:outline-none focus:border-blue-500">
                     <input id="emailAuthPass" type="password" placeholder="Password (min 6)" class="w-full border border-amber-200 rounded-lg px-3 py-2 text-xs bg-white focus:outline-none focus:border-blue-500">
                     <div class="flex gap-2">
-                        <button type="button" onclick="signInWithEmail()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-2.5 rounded-lg shadow">Đăng nhập</button>
-                        <button type="button" onclick="signUpWithEmail()" class="flex-1 bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-bold px-3 py-2.5 rounded-lg">Đăng ký</button>
+                        <button type="button" id="btnSignIn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-2.5 rounded-lg shadow">Sign in</button>
+                        <button type="button" id="btnSignUp" class="flex-1 bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-bold px-3 py-2.5 rounded-lg">Sign up</button>
                     </div>
-                    <button type="button" onclick="signInWithGoogle()" class="w-full bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-bold px-3 py-2.5 rounded-lg inline-flex items-center justify-center gap-2">
-                        <i class="fa-brands fa-google text-red-500"></i><span>Google</span>
-                    </button>
-                    <p class="text-[10px] text-amber-800/80 leading-relaxed">Google không chạy với file:// — dùng Email hoặc host HTTPS (Netlify).</p>
+                    <p id="authMsg" class="text-[11px] text-rose-600 hidden"></p>
+                    <p class="text-[10px] text-amber-800/80">Supabase → Auth → Email → Enable (turn off Confirm email to test faster).</p>
                 </div>
             </div>
 
@@ -1202,65 +1196,49 @@
 
         <div id="lightboxThumbnails" class="flex items-center space-x-2 mt-4 max-w-full overflow-x-auto py-2 px-4 bg-slate-900/60 rounded-xl border border-slate-800"></div>
     </div>
-
-
-    <!-- MODAL: MASTER PASSWORD SETUP / UNLOCK -->
-    <div id="vaultModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] flex items-center justify-center hidden p-4">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
-            <div class="bg-slate-900 text-white px-6 py-4">
-                <h3 class="font-bold text-sm tracking-wide" id="vaultModalTitle">MỞ VAULT BẢO MẬT</h3>
-                <p class="text-[11px] text-slate-300 mt-1" id="vaultModalSub">Nhập Master Password để giải mã dữ liệu trên máy bạn.</p>
-            </div>
-            <div class="p-6 space-y-4 text-xs">
-                <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-amber-800 leading-relaxed">
-                    <strong>Quan trọng:</strong> Master Password <u>không bao giờ</u> được gửi lên server.
-                    Mất mật khẩu này = <strong>mất toàn bộ dữ liệu</strong> (không thể khôi phục).
-                </div>
-                <div id="vaultSetupExtra" class="hidden space-y-3">
-                    <div>
-                        <label class="font-bold text-slate-700 block mb-1">Tạo Master Password mới</label>
-                        <input type="password" id="vaultPass1" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 font-medium" placeholder="Tối thiểu 8 ký tự, nên mạnh">
-                    </div>
-                    <div>
-                        <label class="font-bold text-slate-700 block mb-1">Nhập lại Master Password</label>
-                        <input type="password" id="vaultPass2" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 font-medium" placeholder="Nhập lại">
-                    </div>
-                </div>
-                <div id="vaultUnlockExtra" class="space-y-3">
-                    <div>
-                        <label class="font-bold text-slate-700 block mb-1">Master Password</label>
-                        <input type="password" id="vaultPassUnlock" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 font-medium" placeholder="Nhập Master Password" onkeydown="if(event.key==='Enter')confirmVaultPassword()">
-                    </div>
-                </div>
-                <p id="vaultError" class="text-rose-600 font-semibold hidden"></p>
-                <button onclick="confirmVaultPassword()" id="vaultConfirmBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-lg shadow transition">
-                    Mở Vault
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- SUPABASE + E2E ENCRYPTION VERSION -->
+    <!-- LOCAL STORAGE VERSION -->
     <script>
-        // ========== SUPABASE CONFIG (ĐIỀN CỦA BẠN) ==========
+
+        // ========== APP STATE ==========
+        const realNow = new Date();
+        let appState = {
+            currentTab: 'overview',
+            currentYear: realNow.getFullYear(),
+            currentMonth: realNow.getMonth(),
+            plannerDate: realNow.toISOString().split('T')[0],
+            activeAccount: 'Live',
+            accounts: { 'Live': { name: 'Live Account', balance: 100000 } },
+            trades: [],
+            planners: {}
+        };
+        let filterApplied = false;
+        let byDayCurrentWeekStart = new Date();
+        let weeklyMonthCurrent = { year: realNow.getFullYear(), month: realNow.getMonth() };
+
+        // ========== SUPABASE ==========
         const SUPABASE_URL = 'https://mndfpejztiftikeaegkn.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1uZGZwZWp6dGlmdGlrZWFlZ2tuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ5OTE2NzEsImV4cCI6MjEwMDU2NzY3MX0.XcmFGJaEFh239iFU8-EiaVqf49xe66MoJklneD-vqzI';
 
         let supabaseClient = null;
-        try {
-            if (SUPABASE_URL && !SUPABASE_URL.includes('YOUR_') && window.supabase) {
-                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            }
-        } catch (e) { console.warn('Supabase init failed', e); }
-
-        // ========== E2E CRYPTO (Web Crypto API) ==========
-        let vaultKey = null;          // CryptoKey in memory only
-        let vaultUnlocked = false;
-        let vaultIsSetupMode = false; // true = first time create password
         let currentUser = null;
+        let vaultKey = null;
+        let vaultUnlocked = false;
+        let vaultIsSetupMode = false;
+        let didInitialUnlockRender = false;
 
+        function initSupabase() {
+            try {
+                if (window.supabase && window.supabase.createClient) {
+                    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                    return true;
+                }
+            } catch (e) { console.error(e); }
+            return false;
+        }
+
+        // ========== CRYPTO ==========
         function b64encode(buf) {
-            const bytes = new Uint8Array(buf);
+            const bytes = buf instanceof ArrayBuffer ? new Uint8Array(buf) : new Uint8Array(buf);
             let s = '';
             for (let i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]);
             return btoa(s);
@@ -1271,102 +1249,31 @@
             for (let i = 0; i < s.length; i++) bytes[i] = s.charCodeAt(i);
             return bytes.buffer;
         }
-
         async function deriveKey(password, saltBuf) {
             const enc = new TextEncoder();
-            const material = await crypto.subtle.importKey(
-                'raw', enc.encode(password), 'PBKDF2', false, ['deriveKey']
-            );
+            const baseKey = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveKey']);
             return crypto.subtle.deriveKey(
                 { name: 'PBKDF2', salt: saltBuf, iterations: 310000, hash: 'SHA-256' },
-                material,
+                baseKey,
                 { name: 'AES-GCM', length: 256 },
                 false,
                 ['encrypt', 'decrypt']
             );
         }
-
         async function encryptPayload(obj, key) {
             const iv = crypto.getRandomValues(new Uint8Array(12));
-            const plain = new TextEncoder().encode(JSON.stringify(obj));
-            const cipherBuf = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, plain);
-            return { ciphertext: b64encode(cipherBuf), iv: b64encode(iv) };
+            const enc = new TextEncoder();
+            const cipher = await crypto.subtle.encrypt({ name: 'AES-GCM', iv: iv }, key, enc.encode(JSON.stringify(obj)));
+            return { ciphertext: b64encode(cipher), iv: b64encode(iv) };
         }
-
-        async function decryptPayload(ciphertextB64, ivB64, key) {
-            const cipherBuf = b64decode(ciphertextB64);
-            const iv = new Uint8Array(b64decode(ivB64));
-            const plainBuf = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, cipherBuf);
-            return JSON.parse(new TextDecoder().decode(plainBuf));
-        }
-
-        // ========== APP STATE ==========
-        const realNow = new Date();
-        let appState = {
-            currentTab: 'overview',
-            currentYear: realNow.getFullYear(),
-            currentMonth: realNow.getMonth(),
-            plannerDate: realNow.toISOString().split('T')[0],
-            activeAccount: 'Live',
-            accounts: {},
-            trades: [],
-            planners: {}
-        };
-
-        let filterApplied = false;
-        let byDayCurrentWeekStart = new Date();
-        let weeklyMonthCurrent = { year: realNow.getFullYear(), month: realNow.getMonth() };
-
-        // ========== LOCAL CACHE (encrypted-friendly plain cache only while unlocked) ==========
-        function saveLocalData() {
-            if (!vaultUnlocked) return false;
-            const payload = getFullStatePayload();
-            try {
-                localStorage.setItem('jacooodevn_secure_cache_v1', JSON.stringify(payload));
-            } catch (e) {
-                console.warn('cache full, strip images', e);
-                try {
-                    const slim = JSON.parse(JSON.stringify(payload));
-                    if (Array.isArray(slim.trades)) {
-                        slim.trades.forEach(t => {
-                            if (t.chartImgs && t.chartImgs.length) t.chartImgs = [];
-                            if (t.chartImg) t.chartImg = '';
-                        });
-                    }
-                    localStorage.setItem('jacooodevn_secure_cache_v1', JSON.stringify(slim));
-                    appState.trades = slim.trades;
-                    alert('Storage almost full: images cleared so data could be cached.');
-                } catch (e2) {
-                    console.error(e2);
-                    alert('Browser storage full. Export Backup and reduce images.');
-                    return false;
-                }
-            }
-            syncEncryptedToCloud();
-            return true;
-        }
-
-        function loadLocalCache() {
-            try {
-                const raw = localStorage.getItem('jacooodevn_secure_cache_v1');
-                if (!raw) return false;
-                const data = JSON.parse(raw);
-                applyStateFromData(data);
-                return true;
-            } catch (e) {
-                return false;
-            }
-        }
-
-        function applyStateFromData(data) {
-            if (!data || typeof data !== 'object') return;
-            appState.trades = Array.isArray(data.trades) ? data.trades : [];
-            appState.planners = data.planners || {};
-            appState.accounts = data.accounts || { 'Live': { name: 'Live Account', balance: 100000 } };
-            appState.activeAccount = data.activeAccount || Object.keys(appState.accounts)[0] || 'Live';
-            if (data.currentYear != null) appState.currentYear = Number(data.currentYear);
-            if (data.currentMonth != null && data.currentMonth !== undefined) appState.currentMonth = Number(data.currentMonth);
-            if (data.plannerDate) appState.plannerDate = data.plannerDate;
+        async function decryptPayload(cipherB64, ivB64, key) {
+            const dec = new TextDecoder();
+            const plain = await crypto.subtle.decrypt(
+                { name: 'AES-GCM', iv: new Uint8Array(b64decode(ivB64)) },
+                key,
+                b64decode(cipherB64)
+            );
+            return JSON.parse(dec.decode(plain));
         }
 
         function getFullStatePayload() {
@@ -1377,110 +1284,112 @@
                 planners: appState.planners,
                 accounts: appState.accounts,
                 activeAccount: appState.activeAccount,
-                currentTab: appState.currentTab,
                 currentYear: appState.currentYear,
                 currentMonth: appState.currentMonth,
                 plannerDate: appState.plannerDate
             };
         }
 
-        // ========== SUPABASE AUTH ==========
-        async function signInWithGoogle() {
-            if (!supabaseClient) {
-                alert('Chưa cấu hình Supabase.');
-                return;
-            }
-            if (location.protocol === 'file:') {
-                alert('Google login không chạy khi mở file HTML trực tiếp (file://).\n\nDùng Đăng nhập Email, hoặc host lên Netlify / localhost.');
-                return;
-            }
-            const { error } = await supabaseClient.auth.signInWithOAuth({
-                provider: 'google',
-                options: { redirectTo: window.location.href.split('#')[0] }
-            });
-            if (error) alert('Lỗi Google: ' + error.message);
+        function applyStateFromData(data) {
+            if (!data || typeof data !== 'object') return;
+            appState.trades = Array.isArray(data.trades) ? data.trades : [];
+            appState.planners = data.planners || {};
+            appState.accounts = data.accounts || { 'Live': { name: 'Live Account', balance: 100000 } };
+            appState.activeAccount = data.activeAccount || Object.keys(appState.accounts)[0] || 'Live';
+            if (data.currentYear != null) appState.currentYear = Number(data.currentYear);
+            if (data.currentMonth != null) appState.currentMonth = Number(data.currentMonth);
+            if (data.plannerDate) appState.plannerDate = data.plannerDate;
         }
 
-        async function signInWithEmail() {
-            if (!supabaseClient) { alert('Chưa cấu hình Supabase'); return; }
-            const email = (document.getElementById('emailAuthEmail') && document.getElementById('emailAuthEmail').value || '').trim();
-            const password = (document.getElementById('emailAuthPass') && document.getElementById('emailAuthPass').value) || '';
-            if (!email || !password) { alert('Nhập email và password'); return; }
-            const { error } = await supabaseClient.auth.signInWithPassword({ email: email, password: password });
-            if (error) alert('Đăng nhập thất bại: ' + error.message);
-        }
-
-        async function signUpWithEmail() {
-            if (!supabaseClient) { alert('Chưa cấu hình Supabase'); return; }
-            const email = (document.getElementById('emailAuthEmail') && document.getElementById('emailAuthEmail').value || '').trim();
-            const password = (document.getElementById('emailAuthPass') && document.getElementById('emailAuthPass').value) || '';
-            if (!email || !password) { alert('Nhập email và password'); return; }
-            if (password.length < 6) { alert('Password tối thiểu 6 ký tự'); return; }
-            const { data, error } = await supabaseClient.auth.signUp({ email: email, password: password });
-            if (error) { alert('Đăng ký thất bại: ' + error.message); return; }
-            if (data && data.user && !data.session) {
-                alert('Đăng ký OK. Tắt Confirm email trong Supabase (Auth → Providers → Email) rồi đăng nhập, hoặc xác nhận email.');
-            } else {
-                alert('Đăng ký thành công! Tiếp theo tạo Master Password.');
+        function saveLocalCache() {
+            try {
+                const slim = getFullStatePayload();
+                // cache without huge images if needed
+                localStorage.setItem('jacooodevn_secure_cache_v1', JSON.stringify(slim));
+            } catch (e) {
+                try {
+                    const slim = getFullStatePayload();
+                    slim.trades = (slim.trades || []).map(t => {
+                        const x = Object.assign({}, t);
+                        x.chartImgs = [];
+                        x.chartImg = '';
+                        return x;
+                    });
+                    localStorage.setItem('jacooodevn_secure_cache_v1', JSON.stringify(slim));
+                } catch (_) {}
             }
         }
 
-        async function handleLogout() {
-            vaultKey = null;
-            vaultUnlocked = false;
-            clearVaultSession();
-            currentUser = null;
-            appState.trades = [];
-            appState.planners = {};
-            appState.accounts = {};
-            localStorage.removeItem('jacooodevn_secure_cache_v1');
-            if (supabaseClient) await supabaseClient.auth.signOut();
-            updateAuthUI(null);
-            showLockedUI();
+        function loadLocalCache() {
+            try {
+                const raw = localStorage.getItem('jacooodevn_secure_cache_v1');
+                if (!raw) return false;
+                applyStateFromData(JSON.parse(raw));
+                return true;
+            } catch (_) { return false; }
         }
 
-        function updateAuthUI(user) {
-            const out = document.getElementById('authLoggedOut');
-            const inn = document.getElementById('authLoggedIn');
-            if (user) {
-                if (out) out.classList.add('hidden');
-                if (inn) inn.classList.remove('hidden');
-                document.getElementById('userName').innerText = user.user_metadata?.full_name || user.email?.split('@')[0] || 'User';
-                document.getElementById('userEmail').innerText = user.email || '';
-                const av = document.getElementById('userAvatarContainer');
-                if (user.user_metadata?.avatar_url) {
-                    av.innerHTML = `<img src="${user.user_metadata.avatar_url}" class="w-full h-full rounded-full object-cover">`;
-                } else {
-                    av.innerText = (user.email || 'U').charAt(0).toUpperCase();
-                }
-            } else {
-                if (inn) inn.classList.add('hidden');
-                if (out) out.classList.remove('hidden');
+        let syncTimer = null;
+        async function syncEncryptedToCloud(force, saltOverride) {
+            if (!vaultUnlocked || !vaultKey || !supabaseClient || !currentUser) return;
+            try {
+                const payload = getFullStatePayload();
+                const { ciphertext, iv } = await encryptPayload(payload, vaultKey);
+                let saltB64 = localStorage.getItem('jacooodevn_vault_salt_' + currentUser.id);
+                if (saltOverride) saltB64 = b64encode(saltOverride);
+                const row = {
+                    user_id: currentUser.id,
+                    ciphertext: ciphertext,
+                    iv: iv,
+                    salt: saltB64,
+                    updated_at: new Date().toISOString()
+                };
+                const { error } = await supabaseClient.from('journal_vault').upsert(row, { onConflict: 'user_id' });
+                if (error) console.warn('cloud sync', error);
+            } catch (e) {
+                console.warn('sync', e);
             }
+        }
+
+        function saveLocalData() {
+            if (!vaultUnlocked) return false;
+            saveLocalCache();
+            clearTimeout(syncTimer);
+            syncTimer = setTimeout(function() { syncEncryptedToCloud(); }, 600);
+            return true;
         }
 
         function showLockedUI() {
-            document.getElementById('loginRequiredBanner')?.classList.remove('hidden');
-            document.getElementById('mainDashboardContent')?.classList.add('hidden');
-            document.getElementById('authDependentControls')?.classList.add('hidden');
+            vaultUnlocked = false;
+            const b = document.getElementById('loginRequiredBanner');
+            const m = document.getElementById('mainDashboardContent');
+            if (b) b.classList.remove('hidden');
+            if (m) m.classList.add('hidden');
             document.getElementById('headerNewTradeBtn')?.classList.add('hidden');
             document.getElementById('headerBatchImportBtn')?.classList.add('hidden');
-            const badge = document.getElementById('vaultStatusBadge');
-            if (badge) badge.innerText = 'Vault khóa';
+            document.getElementById('authDependentControls')?.classList.add('hidden');
+            document.getElementById('authLoggedOut')?.classList.remove('hidden');
+            document.getElementById('authLoggedIn')?.classList.add('hidden');
         }
 
-        let didInitialUnlockRender = false;
         function showUnlockedUI() {
             document.getElementById('loginRequiredBanner')?.classList.add('hidden');
             document.getElementById('mainDashboardContent')?.classList.remove('hidden');
-            document.getElementById('authDependentControls')?.classList.remove('hidden');
             document.getElementById('headerNewTradeBtn')?.classList.remove('hidden');
             document.getElementById('headerBatchImportBtn')?.classList.remove('hidden');
+            document.getElementById('authDependentControls')?.classList.remove('hidden');
+            document.getElementById('authLoggedOut')?.classList.add('hidden');
+            document.getElementById('authLoggedIn')?.classList.remove('hidden');
             const badge = document.getElementById('vaultStatusBadge');
-            if (badge) badge.innerText = 'Vault mở · E2E';
+            if (badge) badge.innerText = 'Vault open';
+            if (currentUser) {
+                const email = currentUser.email || '';
+                const el = document.getElementById('userEmail');
+                const nm = document.getElementById('userName');
+                if (el) el.innerText = email;
+                if (nm) nm.innerText = email.split('@')[0] || 'User';
+            }
             updateAccountSelectors();
-            loadAppState();
-            // Chỉ ép Overview 1 lần khi vừa load trang (F5). Trong session giữ tab hiện tại.
             if (!didInitialUnlockRender) {
                 didInitialUnlockRender = true;
                 appState.currentTab = 'overview';
@@ -1488,206 +1397,107 @@
             } else {
                 switchTab(appState.currentTab || 'overview', true);
             }
-            restoreSidebarSections();
+            if (typeof restoreSidebarSections === 'function') restoreSidebarSections();
         }
 
         function openVaultModal(isSetup) {
             vaultIsSetupMode = !!isSetup;
-            document.getElementById('vaultModal').classList.remove('hidden');
-            document.getElementById('vaultError').classList.add('hidden');
-            document.getElementById('vaultPass1').value = '';
-            document.getElementById('vaultPass2').value = '';
-            document.getElementById('vaultPassUnlock').value = '';
+            const modal = document.getElementById('vaultModal');
+            const title = document.getElementById('vaultModalTitle');
+            const setup = document.getElementById('vaultSetupFields');
+            const unlock = document.getElementById('vaultUnlockFields');
+            const err = document.getElementById('vaultErr');
+            if (err) { err.classList.add('hidden'); err.innerText = ''; }
             if (isSetup) {
-                document.getElementById('vaultModalTitle').innerText = 'TẠO MASTER PASSWORD';
-                document.getElementById('vaultModalSub').innerText = 'Lần đầu sử dụng — tạo mật khẩu mạnh để mã hóa toàn bộ journal.';
-                document.getElementById('vaultSetupExtra').classList.remove('hidden');
-                document.getElementById('vaultUnlockExtra').classList.add('hidden');
-                document.getElementById('vaultConfirmBtn').innerText = 'Tạo Vault & Mã hóa';
+                if (title) title.innerText = 'Create Master Password';
+                setup?.classList.remove('hidden');
+                unlock?.classList.add('hidden');
             } else {
-                document.getElementById('vaultModalTitle').innerText = 'MỞ VAULT BẢO MẬT';
-                document.getElementById('vaultModalSub').innerText = 'Nhập Master Password để giải mã dữ liệu trên máy bạn.';
-                document.getElementById('vaultSetupExtra').classList.add('hidden');
-                document.getElementById('vaultUnlockExtra').classList.remove('hidden');
-                document.getElementById('vaultConfirmBtn').innerText = 'Mở Vault';
-                setTimeout(() => document.getElementById('vaultPassUnlock')?.focus(), 100);
+                if (title) title.innerText = 'Open Vault';
+                setup?.classList.add('hidden');
+                unlock?.classList.remove('hidden');
             }
+            modal?.classList.remove('hidden');
         }
 
         function closeVaultModal() {
-            document.getElementById('vaultModal').classList.add('hidden');
+            document.getElementById('vaultModal')?.classList.add('hidden');
         }
 
-        async function confirmVaultPassword() {
-            const errEl = document.getElementById('vaultError');
-            errEl.classList.add('hidden');
+        async function submitVault() {
+            const err = document.getElementById('vaultErr');
             try {
                 if (vaultIsSetupMode) {
-                    const p1 = document.getElementById('vaultPass1').value;
-                    const p2 = document.getElementById('vaultPass2').value;
-                    if (!p1 || p1.length < 8) throw new Error('Master Password tối thiểu 8 ký tự');
-                    if (p1 !== p2) throw new Error('Hai mật khẩu không khớp');
+                    const p1 = document.getElementById('vaultPassSetup').value;
+                    const p2 = document.getElementById('vaultPassSetup2').value;
+                    if (!p1 || p1.length < 6) throw new Error('Password min 6 characters');
+                    if (p1 !== p2) throw new Error('Passwords do not match');
                     const salt = crypto.getRandomValues(new Uint8Array(16));
                     vaultKey = await deriveKey(p1, salt);
-                    // init empty state if needed
-                    if (!appState.accounts || Object.keys(appState.accounts).length === 0) {
+                    vaultUnlocked = true;
+                    localStorage.setItem('jacooodevn_vault_salt_' + currentUser.id, b64encode(salt));
+                    if (!appState.accounts || !Object.keys(appState.accounts).length) {
                         appState.accounts = { 'Live': { name: 'Live Account', balance: 100000 } };
                         appState.activeAccount = 'Live';
-                        appState.trades = [];
-                        appState.planners = {};
                     }
-                    vaultUnlocked = true;
-                    markVaultSession();
-                    // store salt locally tied to user (salt is not secret)
-                    localStorage.setItem('jacooodevn_vault_salt_' + (currentUser?.id || 'local'), b64encode(salt));
+                    saveLocalCache();
                     await syncEncryptedToCloud(true, salt);
                     closeVaultModal();
                     showUnlockedUI();
                 } else {
                     const pw = document.getElementById('vaultPassUnlock').value;
-                    if (!pw) throw new Error('Vui lòng nhập Master Password');
-                    await unlockWithPassword(pw);
-                }
-            } catch (e) {
-                errEl.innerText = e.message || String(e);
-                errEl.classList.remove('hidden');
-            }
-        }
-
-        async function unlockWithPassword(password) {
-            // Try cloud first, then local salt
-            let row = null;
-            if (supabaseClient && currentUser) {
-                const { data, error } = await supabaseClient
-                    .from('journal_vault')
-                    .select('ciphertext, iv, salt, updated_at')
-                    .eq('user_id', currentUser.id)
-                    .maybeSingle();
-                if (error) console.warn('vault fetch', error);
-                row = data;
-            }
-
-            let saltB64 = row?.salt || localStorage.getItem('jacooodevn_vault_salt_' + (currentUser?.id || 'local'));
-            if (!saltB64) {
-                // No vault yet → setup mode
-                openVaultModal(true);
-                return;
-            }
-            const saltBuf = b64decode(saltB64);
-            const key = await deriveKey(password, saltBuf);
-
-            if (row?.ciphertext && row?.iv) {
-                try {
-                    const data = await decryptPayload(row.ciphertext, row.iv, key);
-                    applyStateFromData(data);
+                    if (!pw) throw new Error('Enter Master Password');
+                    let row = null;
+                    if (supabaseClient && currentUser) {
+                        const res = await supabaseClient.from('journal_vault').select('ciphertext, iv, salt').eq('user_id', currentUser.id).maybeSingle();
+                        row = res.data;
+                    }
+                    const saltB64 = (row && row.salt) || localStorage.getItem('jacooodevn_vault_salt_' + currentUser.id);
+                    if (!saltB64) {
+                        openVaultModal(true);
+                        return;
+                    }
+                    const key = await deriveKey(pw, b64decode(saltB64));
+                    if (row && row.ciphertext && row.iv) {
+                        try {
+                            const data = await decryptPayload(row.ciphertext, row.iv, key);
+                            applyStateFromData(data);
+                        } catch (e) {
+                            throw new Error('Wrong Master Password');
+                        }
+                    } else {
+                        loadLocalCache();
+                    }
                     vaultKey = key;
                     vaultUnlocked = true;
-                    markVaultSession();
                     localStorage.setItem('jacooodevn_vault_salt_' + currentUser.id, saltB64);
-                    saveLocalData(); // refresh cache
+                    saveLocalCache();
                     closeVaultModal();
                     showUnlockedUI();
-                    return;
-                } catch (e) {
-                    throw new Error('Sai Master Password hoặc dữ liệu hỏng');
+                }
+            } catch (e) {
+                if (err) {
+                    err.innerText = e.message || String(e);
+                    err.classList.remove('hidden');
+                } else {
+                    alert(e.message || String(e));
                 }
             }
-
-            // Cloud empty but salt exists — try local cache after verifying password by encrypting a probe
-            // If only salt locally and cache exists, accept key and load cache
-            vaultKey = key;
-            vaultUnlocked = true;
-            markVaultSession();
-            loadLocalCache();
-            if (!appState.accounts || Object.keys(appState.accounts).length === 0) {
-                appState.accounts = { 'Live': { name: 'Live Account', balance: 100000 } };
-                appState.activeAccount = 'Live';
-            }
-            await syncEncryptedToCloud(true, new Uint8Array(saltBuf));
-            closeVaultModal();
-            showUnlockedUI();
-        }
-
-        let syncTimer = null;
-        async function syncEncryptedToCloud(force = false, saltOverride = null) {
-            if (!vaultUnlocked || !vaultKey || !supabaseClient || !currentUser) return;
-            if (syncTimer && !force) return;
-            const doSync = async () => {
-                try {
-                    let saltB64 = localStorage.getItem('jacooodevn_vault_salt_' + currentUser.id);
-                    if (saltOverride) {
-                        saltB64 = b64encode(saltOverride);
-                        localStorage.setItem('jacooodevn_vault_salt_' + currentUser.id, saltB64);
-                    }
-                    if (!saltB64) return;
-                    const { ciphertext, iv } = await encryptPayload(getFullStatePayload(), vaultKey);
-                    const { error } = await supabaseClient.from('journal_vault').upsert({
-                        user_id: currentUser.id,
-                        ciphertext,
-                        iv,
-                        salt: saltB64,
-                        updated_at: new Date().toISOString()
-                    }, { onConflict: 'user_id' });
-                    if (error) console.error('cloud sync error', error);
-                } catch (e) {
-                    console.error('encrypt/sync', e);
-                }
-            };
-            if (force) {
-                await doSync();
-            } else {
-                clearTimeout(syncTimer);
-                syncTimer = setTimeout(() => { syncTimer = null; doSync(); }, 800);
-            }
-        }
-
-        const VAULT_SESSION_MS = 5 * 60 * 1000; // 5 phút
-
-        function markVaultSession() {
-            try { sessionStorage.setItem('jacooodevn_vault_until', String(Date.now() + VAULT_SESSION_MS)); } catch (_) {}
-        }
-        function isVaultSessionValid() {
-            try {
-                const t = Number(sessionStorage.getItem('jacooodevn_vault_until') || 0);
-                return Date.now() < t;
-            } catch (_) { return false; }
-        }
-        function clearVaultSession() {
-            try { sessionStorage.removeItem('jacooodevn_vault_until'); } catch (_) {}
         }
 
         async function onAuthReady(session) {
-            currentUser = session?.user || null;
-            updateAuthUI(currentUser);
+            currentUser = session && session.user ? session.user : null;
             if (!currentUser) {
-                vaultUnlocked = false;
-                vaultKey = null;
-                clearVaultSession();
                 showLockedUI();
                 return;
             }
-            // Đã mở vault trong session hiện tại → không hỏi lại
-            if (vaultUnlocked && vaultKey) {
-                showUnlockedUI();
-                return;
-            }
-            // Trong cửa sổ 5 phút: dùng cache local, không hỏi password
-            if (isVaultSessionValid() && loadLocalCache()) {
-                vaultUnlocked = true;
-                // vaultKey null → sync cloud sẽ bỏ qua cho đến khi user mở lại; local vẫn lưu
-                showUnlockedUI();
-                return;
-            }
-            // Check if vault exists
+            document.getElementById('authLoggedOut')?.classList.add('hidden');
+            document.getElementById('authLoggedIn')?.classList.remove('hidden');
             let hasVault = false;
-            if (supabaseClient) {
-                const { data } = await supabaseClient
-                    .from('journal_vault')
-                    .select('user_id')
-                    .eq('user_id', currentUser.id)
-                    .maybeSingle();
-                hasVault = !!data;
-            }
+            try {
+                const res = await supabaseClient.from('journal_vault').select('user_id').eq('user_id', currentUser.id).maybeSingle();
+                hasVault = !!(res && res.data);
+            } catch (_) {}
             if (!hasVault && !localStorage.getItem('jacooodevn_vault_salt_' + currentUser.id)) {
                 openVaultModal(true);
             } else {
@@ -1695,10 +1505,69 @@
             }
         }
 
-        // ========== BACKUP (plaintext export still available when unlocked) ==========
+        function showAuthMsg(msg) {
+            const el = document.getElementById('authMsg');
+            if (!el) { alert(msg); return; }
+            el.innerText = msg;
+            el.classList.remove('hidden');
+        }
+
+        async function signInWithEmail() {
+            if (!supabaseClient) initSupabase();
+            if (!supabaseClient) {
+                showAuthMsg('Supabase SDK not loaded. Check internet connection.');
+                return;
+            }
+            const email = ((document.getElementById('emailAuthEmail') && document.getElementById('emailAuthEmail').value) || '').trim();
+            const password = (document.getElementById('emailAuthPass') && document.getElementById('emailAuthPass').value) || '';
+            if (!email || !password) {
+                showAuthMsg('Enter email and password');
+                return;
+            }
+            const { error } = await supabaseClient.auth.signInWithPassword({ email: email, password: password });
+            if (error) showAuthMsg('Sign in failed: ' + error.message);
+        }
+
+        async function signUpWithEmail() {
+            if (!supabaseClient) initSupabase();
+            if (!supabaseClient) {
+                showAuthMsg('Supabase SDK not loaded. Check internet.');
+                return;
+            }
+            const email = ((document.getElementById('emailAuthEmail') && document.getElementById('emailAuthEmail').value) || '').trim();
+            const password = (document.getElementById('emailAuthPass') && document.getElementById('emailAuthPass').value) || '';
+            if (!email || !password) {
+                showAuthMsg('Enter email and password');
+                return;
+            }
+            if (password.length < 6) {
+                showAuthMsg('Password min 6 characters');
+                return;
+            }
+            const { data, error } = await supabaseClient.auth.signUp({ email: email, password: password });
+            if (error) {
+                showAuthMsg('Sign up failed: ' + error.message);
+                return;
+            }
+            if (data && data.user && !data.session) {
+                showAuthMsg('Sign up OK. Disable Confirm email in Supabase, then Sign in.');
+            } else {
+                showAuthMsg('Sign up OK. Create Master Password next.');
+            }
+        }
+
+        async function handleLogout() {
+            vaultKey = null;
+            vaultUnlocked = false;
+            currentUser = null;
+            didInitialUnlockRender = false;
+            if (supabaseClient) await supabaseClient.auth.signOut();
+            showLockedUI();
+        }
+
+                // ========== BACKUP (plaintext export still available when unlocked) ==========
         // ===== HARD-DISK BACKUP (JSON file on real disk) =====
         function exportFullBackup() {
-            if (!vaultUnlocked) { alert("Hãy mở Vault trước"); return; }
             try {
                 const payload = getFullStatePayload();
                 const json = JSON.stringify(payload, null, 2);
@@ -1738,14 +1607,21 @@
                     const data = JSON.parse(e.target.result);
                     if (!data || typeof data !== 'object') throw new Error('Invalid backup file');
                     let trades = Array.isArray(data.trades) ? data.trades : [];
-                    // Prevent storage overflow: strip embedded base64 images if payload is huge
                     const rawSize = (e.target.result || '').length;
-                    if (rawSize > 2_500_000) {
-                        const strip = confirm('Backup is very large (' + Math.round(rawSize/1024/1024*10)/10 + ' MB).
-
-OK = import WITHOUT chart images (recommended)
-Cancel = try full import (may fail if storage full)');
+                    if (rawSize > 2500000) {
+                        const strip = confirm('Backup is very large (' + Math.round(rawSize/1024/1024*10)/10 + ' MB).\n\nOK = import WITHOUT chart images (recommended)\nCancel = try full import');
                         if (strip) {
+                            trades = trades.map(t => {
+                                const x = Object.assign({}, t);
+                                x.chartImgs = [];
+                                x.chartImg = '';
+                                return x;
+                            });
+                        }
+                    } else {
+                        // still strip images if many base64 present to avoid quota
+                        const hasBigImgs = trades.some(t => (t.chartImgs && t.chartImgs.join('').length > 500000) || (t.chartImg && t.chartImg.length > 200000));
+                        if (hasBigImgs) {
                             trades = trades.map(t => {
                                 const x = Object.assign({}, t);
                                 x.chartImgs = [];
@@ -1764,8 +1640,7 @@ Cancel = try full import (may fail if storage full)');
                     saveLocalData();
                     updateAccountSelectors();
                     switchTab('overview', true);
-                    alert('Backup restored.
-Trades: ' + appState.trades.length);
+                    alert('Backup restored. Trades: ' + appState.trades.length);
                 } catch (err) {
                     console.error(err);
                     alert('Không đọc được file backup: ' + err.message);
@@ -2591,7 +2466,7 @@ Trades: ' + appState.trades.length);
                             const ctx = canvas.getContext('2d');
                             let width = img.width;
                             let height = img.height;
-                            const maxDim = 600;
+                            const maxDim = 900;
                             if (width > height && width > maxDim) {
                                 height *= maxDim / width;
                                 width = maxDim;
@@ -2602,7 +2477,7 @@ Trades: ' + appState.trades.length);
                             canvas.width = width;
                             canvas.height = height;
                             ctx.drawImage(img, 0, 0, width, height);
-                            const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.45);
+                            const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
                             currentModalImages.push(compressedDataUrl);
                             renderImagePreviews();
                         };
@@ -3550,22 +3425,54 @@ Trades: ' + appState.trades.length);
         }
 
         window.onload = async function() {
+            initSupabase();
+            // Wire auth buttons
+            var btnIn = document.getElementById('btnSignIn');
+            var btnUp = document.getElementById('btnSignUp');
+            var btnVault = document.getElementById('btnVaultSubmit');
+            if (btnIn) btnIn.onclick = function() { signInWithEmail(); };
+            if (btnUp) btnUp.onclick = function() { signUpWithEmail(); };
+            if (btnVault) btnVault.onclick = function() { submitVault(); };
+            document.getElementById('emailAuthPass')?.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') signInWithEmail();
+            });
+            document.getElementById('vaultPassUnlock')?.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') submitVault();
+            });
+
             showLockedUI();
             if (!supabaseClient) {
-                console.warn('Supabase chưa cấu hình — điền SUPABASE_URL và SUPABASE_ANON_KEY trong file HTML');
-            } else {
-                const { data: { session } } = await supabaseClient.auth.getSession();
-                await onAuthReady(session);
-                supabaseClient.auth.onAuthStateChange(async (event, session) => {
-                    if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
-                        await onAuthReady(session);
-                    } else if (event === 'SIGNED_OUT') {
-                        await onAuthReady(null);
-                    }
-                });
+                showAuthMsg('Cannot load Supabase. Check network / CDN.');
+                return;
             }
-            checkBackupReminder();
+            const sessionRes = await supabaseClient.auth.getSession();
+            await onAuthReady(sessionRes.data.session);
+            supabaseClient.auth.onAuthStateChange(async function(event, session) {
+                if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED') {
+                    await onAuthReady(session);
+                } else if (event === 'SIGNED_OUT') {
+                    await onAuthReady(null);
+                }
+            });
+            if (typeof checkBackupReminder === 'function') checkBackupReminder();
         };
     </script>
+
+    <div id="vaultModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
+            <h3 id="vaultModalTitle" class="text-sm font-bold text-slate-900 mb-1">Open Vault</h3>
+            <p class="text-[11px] text-slate-500 mb-4">Master Password never leaves this device. Losing it = cannot decrypt data.</p>
+            <div id="vaultSetupFields" class="hidden space-y-2 mb-3">
+                <input id="vaultPassSetup" type="password" placeholder="Create Master Password" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs">
+                <input id="vaultPassSetup2" type="password" placeholder="Confirm Master Password" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs">
+            </div>
+            <div id="vaultUnlockFields" class="space-y-2 mb-3">
+                <input id="vaultPassUnlock" type="password" placeholder="Master Password" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs">
+            </div>
+            <p id="vaultErr" class="text-[11px] text-rose-600 hidden mb-2"></p>
+            <button type="button" id="btnVaultSubmit" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2.5 rounded-lg">Continue</button>
+        </div>
+    </div>
+
 </body>
 </html>
